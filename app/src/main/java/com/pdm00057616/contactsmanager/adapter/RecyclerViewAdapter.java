@@ -52,6 +52,13 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         return contacts.size();
     }
 
+    public void setFilter(ArrayList<Contacts> contacts){
+        this.contacts=new ArrayList<>();
+        contacts.addAll(contacts);
+        notifyDataSetChanged();
+
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         ImageView imageViewPhoto;
