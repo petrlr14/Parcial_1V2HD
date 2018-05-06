@@ -97,4 +97,11 @@ public class ContactGetter {
         return birthday;
     }
 
+    public static String getLastID(Context context){
+        ContentResolver contentResolver = context.getContentResolver();
+        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        cursor.moveToLast();
+        return cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+    }
+
 }
