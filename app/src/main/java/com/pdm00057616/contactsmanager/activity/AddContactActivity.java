@@ -349,7 +349,7 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     private int getItemTypeSpinnerEmail(int i) {
-        String item = ((Spinner) ((LinearLayout) linearLayoutPhone.getChildAt(i)).getChildAt(1)).getSelectedItem().toString();
+        String item = ((Spinner) ((LinearLayout) linearLayoutEmail.getChildAt(i)).getChildAt(1)).getSelectedItem().toString();
         if (item.equals("Home")) {
             return 1;
         } else if (item.equals("Work")) {
@@ -360,7 +360,7 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     private int getItemTypeSpinnerAddress(int i) {
-        String item = ((Spinner) ((LinearLayout) linearLayoutPhone.getChildAt(i)).getChildAt(1)).getSelectedItem().toString();
+        String item = ((Spinner) ((LinearLayout) linearLayoutAddress.getChildAt(i)).getChildAt(1)).getSelectedItem().toString();
         if (item.equals("Home")) {
             return 1;
         } else {
