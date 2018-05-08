@@ -8,14 +8,19 @@
     <string name="type_of_data_description">type of data</string>
     <string name="add_contact_activity_title">Add contact</string>
     <string name="phone_number_hint">Phone number</string>
-    <string name="first_name_hint">First name</string>
-    <string name="last_name_hint">Last name</string>
+    <string name="first_name_hint">First</string>
+    <string name="middle_name_hint">Middle</string>
+    <string name="last_name_hint">Last </string>
     <string name="email_hint">Email</string>
     <string name="address_hint">Address</string>
     <string name="done_text">done</string>
     <string name="no_date_yet_text">no date yet</string>
     <string name="birthday_text">Birthday:</string>
     <string name="search_title_menu_item">search</string>
+    <string name="address_text_view">ADDRESS</string>
+    <string name="edit_menu_item">EDIT</string>
+    <string name="edit_contact_activity_title">Edit contact</string>
+    <string name="name_text">Name</string>
 
     <string-array name="spinner_phones_types">
         <item>Home</item>

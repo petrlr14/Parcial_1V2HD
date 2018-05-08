@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorControlNormal">@color/white</item>
         <item name="cardViewStyle">@style/CardView</item>
-
+        <item name="actionMenuTextColor">@color/white</item>
     </style>
 
 </resources>
