@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Manejador de Contactos</string>
+    <string name="user_photo_description">foto de usuario</string>
+    <string name="fav_button_description">boton favorio</string>
+    <string name="view_info_activity_name">Informacion de contacto</string>
+    <string name="phone_numers_text">NUMERO DE TELEFONO</string>
+    <string name="email_address_text">Direccion de correo electronico</string>
+    <string name="type_of_data_description">tipo de dato</string>
+    <string name="add_contact_activity_title">Agregar Contacto</string>
+    <string name="phone_number_hint">"Numero de telefono "</string>
+    <string name="first_name_hint">Primero</string>
+    <string name="middle_name_hint">Segundo</string>
+    <string name="last_name_hint">Apellidp</string>
+    <string name="email_hint">Correo electronico</string>
+    <string name="address_hint">Direccion</string>
+    <string name="done_text">hecho</string>
+    <string name="no_date_yet_text">sin fecha</string>
+    <string name="birthday_text">Cumpleaños:</string>
+    <string name="search_title_menu_item">buscar</string>
+    <string name="address_text_view">DIRECION</string>
+    <string name="edit_menu_item">EDITAR</string>
+    <string name="edit_contact_activity_title">Editar contacto</string>
+    <string name="name_text">Nombre</string>
+
+    <string name="toast1">debe ingresar almenos nombre y un campo que no sea cumpleaños</string>
+    <string name="toast2">Debe ingresar un campo adicional que no sea cumpleaños</string>
+    <string name="toast3">Debe ingresar su nombre</string>
+
+</resources>
