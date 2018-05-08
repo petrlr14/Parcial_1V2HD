@@ -55,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permissionManager=new PermissionManager(){};
+        if(savedInstanceState!=null){
+            contacts=savedInstanceState.getParcelableArrayList("list");
+        }
+        //Se verifica que se tengan los permisos
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_CONTACTS)==
                 PackageManager.PERMISSION_GRANTED){
             bindViews();
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //se maneja lo que se hace en caso que se acepten o nieguen los permisos
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionManager.checkResult(requestCode,permissions,grantResults);
@@ -76,12 +81,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //se crea animacion en searchview
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         TransitionManager.beginDelayedTransition(toolbar);
         return true;
     }
 
+    //se agrega searchview al toolbar y se setea su comportamiento
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
@@ -110,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    //se verifican permisos de nuevo para cargar usuarios
     @Override
     protected void onResume() {
         super.onResume();
@@ -119,7 +127,12 @@ public class MainActivity extends AppCompatActivity {
             permissionManager.checkAndRequestPermissions(this);
         }
     }
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("list", contacts);
+    }
+    //se referencian los view
     private void bindViews(){
         toolbar=findViewById(R.id.toolbar);
         fab=findViewById(R.id.fab);
@@ -133,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //se setean referencias al viewpager
     private void init(){
         contacts= ContactGetter.getContacts(activity);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -143,12 +157,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-
+    //intent que abre la actividad de agregar
     private void startActivityAdd(){
         Intent intent=new Intent(activity, AddContactActivity.class);
         startActivity(intent);
     }
 
+    //filtra el arreglo segun query ingresada en el serachview
     private ArrayList<Contacts> filter(ArrayList<Contacts> contacts, String query){
         query=query.toLowerCase();
         final ArrayList<Contacts> filter=new ArrayList<>();
@@ -159,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
         }
         return filter;
     }
+
+    //se obtiene nombre del contacto
     private String getName(Contacts c){
         String name="";
         ArrayList<String> arrayList=new ArrayList<>();

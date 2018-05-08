@@ -146,6 +146,14 @@
                         android:layout_gravity="center"
                         android:layout_marginBottom="@dimen/margin_16dp"
                         android:isScrollContainer="false" />
+
+                    <ImageButton
+                        android:id="@+id/shareButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@null"
+                        android:src="@drawable/share_icon" />
                 </LinearLayout>
             </ScrollView>
         </LinearLayout>

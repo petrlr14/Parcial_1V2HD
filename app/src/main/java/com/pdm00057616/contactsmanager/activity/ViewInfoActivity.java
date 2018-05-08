@@ -21,7 +21,10 @@ import android.widget.TextView;
 import com.karan.churi.PermissionManager.PermissionManager;
 import com.pdm00057616.contactsmanager.R;
 import com.pdm00057616.contactsmanager.adapter.RecyclerViewIndividaulContactAdapter;
+import com.pdm00057616.contactsmanager.model.Address;
 import com.pdm00057616.contactsmanager.model.Contacts;
+import com.pdm00057616.contactsmanager.model.Email;
+import com.pdm00057616.contactsmanager.model.PhoneNumber;
 
 import java.util.ArrayList;
 
@@ -33,12 +36,13 @@ public class ViewInfoActivity extends AppCompatActivity {
     RecyclerView recyclerViewNumbers, recyclerViewEmail, recyclerViewAddress;
     Activity activity = this;
     Toolbar toolbar;
+    ImageButton imageButtonShare;
     //
     Contacts contact;
     RecyclerViewIndividaulContactAdapter adapter;
     PermissionManager permissionManager;
     int type, indice;
-    boolean resume=false;
+    boolean resume = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +64,14 @@ public class ViewInfoActivity extends AppCompatActivity {
         return true;
     }
 
+    //al regresar de la pantalla de edit se vuelven a cargar los elementos textview
     @Override
     protected void onResume() {
         super.onResume();
-        if(resume){
+        if (resume) {
             restoreInfo();
         }
-        resume=false;
+        resume = false;
     }
 
     @Override
@@ -89,6 +94,13 @@ public class ViewInfoActivity extends AppCompatActivity {
         textViewBirthdayLable = findViewById(R.id.textview_birthday);
         textViewBirthday = findViewById(R.id.textview_birthday_contact);
         textViewAddress = findViewById(R.id.textview_address_contact);
+        imageButtonShare = findViewById(R.id.shareButton);
+        imageButtonShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                share();
+            }
+        });
         recyclerViewNumbers = findViewById(R.id.phones_container);
         recyclerViewEmail = findViewById(R.id.email_container);
         recyclerViewAddress = findViewById(R.id.address_container);
@@ -99,6 +111,7 @@ public class ViewInfoActivity extends AppCompatActivity {
 
     }
 
+    //Se inicializa los recyclerview
     private void initComponentsNumber() {
         recyclerViewNumbers.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this) {
@@ -116,7 +129,6 @@ public class ViewInfoActivity extends AppCompatActivity {
         recyclerViewNumbers.setAdapter(adapter);
         recyclerViewNumbers.setLayoutManager(layoutManager);
     }
-
     private void initComponentsEmail() {
         recyclerViewEmail.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this) {
@@ -133,7 +145,6 @@ public class ViewInfoActivity extends AppCompatActivity {
         recyclerViewEmail.setAdapter(adapter);
         recyclerViewEmail.setLayoutManager(layoutManager);
     }
-
     private void initComponentsAddress() {
         recyclerViewAddress.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this) {
@@ -151,6 +162,7 @@ public class ViewInfoActivity extends AppCompatActivity {
         recyclerViewAddress.setLayoutManager(layoutManager);
     }
 
+    //setea la informacion en los campos
     private void setInfo(Intent intent) {
         Bundle bundle = intent.getExtras();
         type = bundle.getInt("type");
@@ -165,7 +177,6 @@ public class ViewInfoActivity extends AppCompatActivity {
         textViewName.setText(setName());
         textViewBirthday.setText(setBirthday());
     }
-
     private String setBirthday() {
         String birthday = "";
         if (contact.getBirthday().equals("")) {
@@ -176,7 +187,6 @@ public class ViewInfoActivity extends AppCompatActivity {
         return birthday;
 
     }
-
     private String setName() {
         String name = "";
         ArrayList<String> nameArray = new ArrayList<>();
@@ -185,14 +195,14 @@ public class ViewInfoActivity extends AppCompatActivity {
         nameArray.add(contact.getName().getLastName());
         for (String x : nameArray) {
             if (x != null) {
-                if(!x.equals("")){
+                if (!x.equals("")) {
                     name += x + " ";
                 }
             }
         }
         return name;
     }
-
+    //inicia intent para llamada
     private void makeCall(int position) {
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + contact.getNumbers().get(position).getNumber()));
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) ==
@@ -203,13 +213,15 @@ public class ViewInfoActivity extends AppCompatActivity {
         }
     }
 
+    //abre actividad edit
     private void opneEditActivity() {
         Intent intent = new Intent(this, EditActivity.class);
         intent.putExtra("contact", MainActivity.contacts.indexOf(contact));
-        resume=true;
+        resume = true;
         startActivity(intent);
     }
 
+    //filtra la lista de contacto
     public int getInternalFilterContact(int type, int index) {
         ArrayList<Contacts> contactsFav = new ArrayList<>();
         if (type == 1) {
@@ -224,7 +236,8 @@ public class ViewInfoActivity extends AppCompatActivity {
         }
     }
 
-    private void restoreInfo(){
+    //se vuelve a cargar la informacion
+    private void restoreInfo() {
         textViewName.setText(setName());
         imageViewPhoto.setImageBitmap(contact.getPhoto());
         recyclerViewNumbers.getAdapter().notifyDataSetChanged();
@@ -233,6 +246,57 @@ public class ViewInfoActivity extends AppCompatActivity {
         textViewBirthday.setText(setBirthday());
     }
 
+    //intent para compartir
+    private void share() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, getShareInfo());
+        intent.setType("text/plain");
+        startActivity(intent);
+    }
+
+    private String getShareInfo() {
+        String info="", name = "", phone="";
+        if (contact.getName().getFirstName() != null) {
+            name += contact.getName().getFirstName();
+        }
+        if (contact.getName().getMiddleName() != null) {
+            name += contact.getName().getMiddleName();
+        }
+        if (contact.getName().getLastName() != null) {
+            name += contact.getName().getLastName();
+        }
+        info+=name+"\n";
+        info+="PHONES\n";
+        if(contact.getNumbers()!=null){
+            if(contact.getNumbers().size()>0){
+                for(PhoneNumber x:contact.getNumbers()){
+                    info+=x.getNumber()+"\n";
+                }
+            }
+        }
+        info+="Email\n";
+        if(contact.getEmail()!=null){
+            if(contact.getEmail().size()>0){
+                for(Email x:contact.getEmail()){
+                    info+=x.getEmail()+"\n";
+                }
+            }
+        }
+        info+="Address\n";
+        if(contact.getAddress()!=null){
+            if(contact.getAddress().size()>0){
+                for(Address x:contact.getAddress()){
+                    info+=x.getAddress()+"\n";
+                }
+            }
+        }
+        info+="Birthday\n";
+        if(contact.getBirthday()!=null){
+            info+=contact.getBirthday();
+        }
+        return info;
+    }
 
 
 }

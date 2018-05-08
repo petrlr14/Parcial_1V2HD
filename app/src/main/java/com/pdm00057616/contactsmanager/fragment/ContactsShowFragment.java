@@ -27,6 +27,7 @@ public class ContactsShowFragment extends Fragment {
     ArrayList<Contacts> contacts;
     ArrayList<Contacts> contactsFav;
 
+
     public static ContactsShowFragment newInstance(int type, ArrayList<Contacts> contacts) {
         ContactsShowFragment fragment = new ContactsShowFragment();
         Bundle args = new Bundle();
@@ -64,7 +65,16 @@ public class ContactsShowFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             type = getArguments().getInt("type");
-            contacts = getArguments().getParcelableArrayList("list");
+            contacts=MainActivity.contacts;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(type==1){
+            contacts=MainActivity.contacts;
+            contactsFav=getInternalFilterContact();
         }
     }
 
@@ -87,6 +97,7 @@ public class ContactsShowFragment extends Fragment {
             boolean fav = contacts.get(position).getFav();
             if (fav) {
                 contacts.get(position).setFav(false);
+                System.out.println();
             } else {
                 contacts.get(position).setFav(true);
             }
@@ -105,6 +116,7 @@ public class ContactsShowFragment extends Fragment {
         if (type == 1) {
             intent.putExtra("contact", position);
             intent.putExtra("type", 1);
+            System.out.println(MainActivity.contacts.get(position).getFav());
         } else {
             intent.putExtra("contact", contactsFav.indexOf(contactsFav.get(position)));
             intent.putExtra("type", 2);
