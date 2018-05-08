@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="@dimen/margin_16dp"
     android:orientation="horizontal">
     <EditText
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:hint="@string/phone_number_hint"
         android:inputType="phone"
         android:maxLines="1"
+        android:singleLine="true"
         android:paddingRight="12dp" />
 
     <Spinner
@@ -20,5 +21,5 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/phone_call" />
+        android:src="@drawable/remove_icon"/>
 </LinearLayout>

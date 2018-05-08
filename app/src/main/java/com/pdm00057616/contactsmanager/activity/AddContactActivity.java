@@ -1,12 +1,16 @@
 package com.pdm00057616.contactsmanager.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -22,10 +26,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.karan.churi.PermissionManager.PermissionManager;
 import com.pdm00057616.contactsmanager.R;
 import com.pdm00057616.contactsmanager.model.Address;
 import com.pdm00057616.contactsmanager.model.Contacts;
 import com.pdm00057616.contactsmanager.model.Email;
+import com.pdm00057616.contactsmanager.model.Name;
 import com.pdm00057616.contactsmanager.model.PhoneNumber;
 import com.pdm00057616.contactsmanager.util.ContactGetter;
 import com.pdm00057616.contactsmanager.util.DatePick;
@@ -40,7 +46,7 @@ public class AddContactActivity extends AppCompatActivity {
     //views
     ImageView imageViewPhoto;
     ImageButton imageButtonAddPhoto, imageButtonAddPhone, imageButtonAddEmail, imageButtonAddAddress;
-    EditText editTextFName, editTextLName, editTextPhone, editTextEmail, editTextAddress;
+    EditText editTextFName, editTextMName ,editTextLName, editTextPhone, editTextEmail, editTextAddress;
     LinearLayout linearLayoutPhone, linearLayoutEmail, linearLayoutAddress;
     Toolbar toolbar;
     Spinner spinnerPhones, spinnerEmail, spinnerAddress;
@@ -49,14 +55,15 @@ public class AddContactActivity extends AppCompatActivity {
     Activity activity = this;
     Bitmap newpic;
     String nameAux, birthdayAux;
+    PermissionManager permissionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_contact);
+        permissionManager=new PermissionManager(){};
         bindViews();
     }
-
     private void bindViews() {
         toolbar = findViewById(R.id.toolbar_add_contact);
         setSupportActionBar(toolbar);
@@ -69,7 +76,14 @@ public class AddContactActivity extends AppCompatActivity {
         imageButtonAddPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImagePicker.pickImage(activity);
+                if(ContextCompat.checkSelfPermission(activity,Manifest.permission.READ_EXTERNAL_STORAGE)==
+                        PackageManager.PERMISSION_GRANTED&&
+                        ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)==
+                        PackageManager.PERMISSION_GRANTED){
+                    ImagePicker.pickImage(activity);
+                }else{
+                    permissionManager.checkAndRequestPermissions(activity);
+                }
             }
         });
 
@@ -122,7 +136,6 @@ public class AddContactActivity extends AppCompatActivity {
         setAdapters();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
@@ -152,6 +165,15 @@ public class AddContactActivity extends AppCompatActivity {
                 default: saveContact();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionManager.checkResult(requestCode,permissions,grantResults);
+        if(permissionManager.getStatus().get(0).granted.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)&&
+                permissionManager.getStatus().get(0).granted.contains(Manifest.permission.READ_EXTERNAL_STORAGE)){
+            ImagePicker.pickImage(this);
+        }
     }
 
     private void setAdapters() {
@@ -228,19 +250,25 @@ public class AddContactActivity extends AppCompatActivity {
         spinner = (Spinner) linear.getChildAt(1);
         spinner.setAdapter(setArrayAdapter(type));
         icon=(ImageView)linear.getChildAt(2);
-        icon.setImageResource(types.get(1));
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout ln=(LinearLayout) v.getParent();
+                ln.setVisibility(View.GONE);
+            }
+        });
     }
 
 
     private void getAllInfo(){
-        nameAux=editTextFName.getText().toString()+editTextLName.getText().toString();
+        nameAux=editTextFName.getText().toString()+" "+editTextLName.getText().toString();
         birthdayAux=textViewBirthday.getText().toString();
     }
 
     private void saveContact(){
         getAllInfo();
         if(VerifyNewContact.isReady(nameAux, birthdayAux,getPhones(), getEmial(), getAddress(), this)){
-            Contacts contact=new Contacts(nameAux, getPhones(), getEmial(), newpic, ContactGetter.getLastID(this), false, getAddress(), birthdayAux);
+            Contacts contact=new Contacts(getName(), getPhones(), getEmial(), newpic, ContactGetter.getLastID(this), false, getAddress(), birthdayAux);
             MainActivity.contacts.add(contact);
             Toast.makeText(activity, "Contact Added", Toast.LENGTH_SHORT).show();
             finish();
@@ -252,7 +280,7 @@ public class AddContactActivity extends AppCompatActivity {
         String number;
         int type;
         for(int i=0; i<linearLayoutPhone.getChildCount();i++){
-            if(linearLayoutPhone.getChildAt(i) instanceof LinearLayout){
+            if(linearLayoutPhone.getChildAt(i) instanceof LinearLayout&&linearLayoutPhone.getChildAt(i).getVisibility()==View.VISIBLE){
                 number=((EditText)((LinearLayout) linearLayoutPhone.getChildAt(i)).getChildAt(0)).getText().toString();
                 type=getItemTypeSpinnerPhone(i);
                 if(!number.equals("")){
@@ -295,7 +323,9 @@ public class AddContactActivity extends AppCompatActivity {
         }
         return address;
     }
-
+    private Name getName(){
+        return new Name(editTextFName.getText().toString(), null, editTextLName.getText().toString());
+    }
 
     private int getItemTypeSpinnerPhone(int i){
         String item=((Spinner)((LinearLayout) linearLayoutPhone.getChildAt(i)).getChildAt(1)).getSelectedItem().toString();
@@ -327,8 +357,6 @@ public class AddContactActivity extends AppCompatActivity {
             return 2;
         }
     }
-
-
 
 
 }

@@ -4,11 +4,16 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.transition.TransitionManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -17,6 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.karan.churi.PermissionManager.PermissionManager;
 import com.pdm00057616.contactsmanager.R;
@@ -62,7 +70,16 @@ public class MainActivity extends AppCompatActivity {
         if(permissionManager.getStatus().get(0).granted.contains(Manifest.permission.READ_CONTACTS)){
             bindViews();
             init();
+            viewPagerAdapter.notifyDataSetChanged();
+        }else{
+            permissionManager.checkAndRequestPermissions(activity);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        TransitionManager.beginDelayedTransition(toolbar);
+        return true;
     }
 
     @Override
@@ -84,19 +101,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                final ArrayList<Contacts> filterList=filter(contacts, newText);
                 ContactsShowFragment page=(ContactsShowFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + viewPager.getCurrentItem());
-                page.setListFilter(filterList);
-                return false;
+                final ArrayList<Contacts>filt=filter(page.getList(viewPager.getCurrentItem()), newText);
+                page.setListFilter(filt);
+                return true;
             }
         });
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        viewPagerAdapter.notifyDataSetChanged();
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)==PackageManager.PERMISSION_GRANTED){
+            viewPagerAdapter.notifyDataSetChanged();
+        }else{
+            permissionManager.checkAndRequestPermissions(this);
+        }
     }
 
     private void bindViews(){
@@ -132,10 +153,23 @@ public class MainActivity extends AppCompatActivity {
         query=query.toLowerCase();
         final ArrayList<Contacts> filter=new ArrayList<>();
         for(Contacts c:contacts){
-            if(c.getName().toLowerCase().startsWith(query)){
+            if(getName(c).startsWith(query)){
                 filter.add(c);
             }
         }
         return filter;
+    }
+    private String getName(Contacts c){
+        String name="";
+        ArrayList<String> arrayList=new ArrayList<>();
+        arrayList.add(c.getName().getFirstName());
+        arrayList.add(c.getName().getMiddleName());
+        arrayList.add(c.getName().getLastName());
+        for(String x:arrayList){
+            if(x!=null){
+                name+=x+" ";
+            }
+        }
+        return name;
     }
 }

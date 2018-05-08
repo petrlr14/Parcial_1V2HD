@@ -13,6 +13,7 @@ public class ImagePicker {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         intent.setType("image/*");
+        System.out.println(getMaxSize(activity));
         intent.putExtra("crop", "true");
         intent.putExtra("scale", true);
         intent.putExtra("outputX",getMaxSize(activity));

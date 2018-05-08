@@ -103,26 +103,24 @@ public class ContactsShowFragment extends Fragment {
     public void openViewActivity(int position) {
         Intent intent = new Intent(getContext(), ViewInfoActivity.class);
         if (type == 1) {
-            intent.putExtra("contact", contacts.get(position));
+            intent.putExtra("contact", position);
+            intent.putExtra("type", 1);
         } else {
-            intent.putExtra("contact", contactsFav.get(position));
+            intent.putExtra("contact", contactsFav.indexOf(contactsFav.get(position)));
+            intent.putExtra("type", 2);
         }
         startActivity(intent);
     }
 
     public void setListFilter(ArrayList<Contacts> fiter) {
-        contacts = new ArrayList<>();
-        contacts.addAll(fiter);
-        switch (type) {
-            case 1:
-                break;
-            case 2:
-                contactsFav = new ArrayList<>();
-                contactsFav=getInternalFilterContact();
-                break;
-        }
+        adapter.setFilter(fiter);
+    }
 
-        adapter.notifyDataSetChanged();
+    public ArrayList<Contacts> getList(int type){
+        switch (type){
+            case 0:return contacts;
+            default:return contactsFav;
+        }
     }
 
 }

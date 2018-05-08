@@ -39,7 +39,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             holder.imageViewPhoto.setImageResource(R.drawable.user);
         }
 
-        holder.textViewName.setText(contact.getName());
+        holder.textViewName.setText(setName(contact));
         if(contact.getFav()){
             holder.imageButtonFav.setImageResource(R.drawable.star_selected);
         }else{
@@ -54,9 +54,8 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     public void setFilter(ArrayList<Contacts> contacts){
         this.contacts=new ArrayList<>();
-        contacts.addAll(contacts);
+        this.contacts.addAll(contacts);
         notifyDataSetChanged();
-
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -90,5 +89,19 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     public abstract void setOnClickCardViewAction(View view, int position);
     public abstract void setOnClickButtonAction(View view, int position);
+
+    private String setName(Contacts contact) {
+        String name = "";
+        ArrayList<String> nameArray = new ArrayList<>();
+        nameArray.add(contact.getName().getFirstName());
+        nameArray.add(contact.getName().getMiddleName());
+        nameArray.add(contact.getName().getLastName());
+        for (String x : nameArray) {
+            if (x != null) {
+                name += x+" ";
+            }
+        }
+        return name;
+    }
 
 }

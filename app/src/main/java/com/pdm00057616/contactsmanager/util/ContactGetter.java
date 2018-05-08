@@ -11,6 +11,7 @@ import android.provider.ContactsContract;
 
 import com.pdm00057616.contactsmanager.model.Contacts;
 import com.pdm00057616.contactsmanager.model.Email;
+import com.pdm00057616.contactsmanager.model.Name;
 import com.pdm00057616.contactsmanager.model.PhoneNumber;
 
 import java.io.InputStream;
@@ -34,21 +35,22 @@ public class ContactGetter {
                 if (inputStream != null) {
                     photo = BitmapFactory.decodeStream(inputStream);
                 }
-                if(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-                    List<Integer> aux=new ArrayList<>();
+                if (cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                    List<Integer> aux = new ArrayList<>();
                     int auxEntero;
                     while (cursorInfo.moveToNext()) {
                         Contacts info = new Contacts(null, null, null, null, null, false, null, null);
-                        if(!aux.contains(Integer.parseInt(id))){
+                        if (!aux.contains(Integer.parseInt(id))) {
                             info.setId(id);
-                            info.setName(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+                            info.setName(getFullName(context, id));
                             info.setNumbers(getContactPhones(context, id));
                             info.setPhoto(photo);
                             info.setEmail(getContactEmail(context, id));
                             info.setBirthday(getBirthday(context, id));
                             list.add(info);
+                            getFullName(context, id);
                         }
-                        auxEntero=Integer.parseInt(id);
+                        auxEntero = Integer.parseInt(id);
                         aux.add(auxEntero);
                     }
                 }
@@ -72,7 +74,7 @@ public class ContactGetter {
         return phoneList;
     }
 
-    public static ArrayList<Email> getContactEmail(Context context, String id){
+    public static ArrayList<Email> getContactEmail(Context context, String id) {
         ArrayList<Email> emailList = new ArrayList<>();
         Uri emailUri = ContactsContract.CommonDataKinds.Email.CONTENT_URI;
         Cursor email = context.getContentResolver().query(emailUri, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
@@ -85,9 +87,9 @@ public class ContactGetter {
         return emailList;
     }
 
-    public static String getBirthday(Context context, String id){
-        String birthday="";
-        Cursor bdc = context.getContentResolver().query(android.provider.ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.CommonDataKinds.Contactables.TYPE }, android.provider.ContactsContract.Data.CONTACT_ID+" = "+id+" AND "+ ContactsContract.Data.MIMETYPE+" = '"+ ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE+"' AND "+ ContactsContract.CommonDataKinds.Event.TYPE+" = "+ ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY, null, android.provider.ContactsContract.Data.DISPLAY_NAME);
+    public static String getBirthday(Context context, String id) {
+        String birthday = "";
+        Cursor bdc = context.getContentResolver().query(android.provider.ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Contactables.TYPE}, android.provider.ContactsContract.Data.CONTACT_ID + " = " + id + " AND " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE + "' AND " + ContactsContract.CommonDataKinds.Event.TYPE + " = " + ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY, null, android.provider.ContactsContract.Data.DISPLAY_NAME);
         if (bdc.getCount() > 0) {
             while (bdc.moveToNext()) {
                 birthday = bdc.getString(0);
@@ -97,7 +99,24 @@ public class ContactGetter {
         return birthday;
     }
 
-    public static String getLastID(Context context){
+    private static Name getFullName(Context context, String id) {
+        Name name=null;
+        ContentResolver contentResolver = context.getContentResolver();
+        String given = "", family = "", middle = "";
+        String whereName = ContactsContract.Data.MIMETYPE + " = ? AND " + ContactsContract.CommonDataKinds.StructuredName.CONTACT_ID + " = " + id;
+        String[] whereNameParams = new String[]{ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE};
+        Cursor nameCur = contentResolver.query(ContactsContract.Data.CONTENT_URI, null, whereName, whereNameParams, ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME);
+        while (nameCur.moveToNext()) {
+            given = nameCur.getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
+            family = nameCur.getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
+            middle = nameCur.getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME));
+            name = new Name(given, middle, family);
+        }
+        nameCur.close();
+        return name;
+    }
+
+    public static String getLastID(Context context) {
         ContentResolver contentResolver = context.getContentResolver();
         Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         cursor.moveToLast();

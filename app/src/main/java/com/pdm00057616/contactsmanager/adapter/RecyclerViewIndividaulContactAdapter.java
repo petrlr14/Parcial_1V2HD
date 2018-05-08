@@ -45,9 +45,12 @@ public abstract class RecyclerViewIndividaulContactAdapter extends RecyclerView.
                 break;
             case 3:
                 List<Address> auxAddress = contacts.getAddress();
-
-                for (int i = 0; i < contacts.getAddress().size(); i++) {
-                    auxType.add(auxAddress.get(i).getType());
+                if (auxAddress == null) {
+                    auxAddress=new ArrayList<>();
+                }else {
+                    for (int i = 0; i < contacts.getAddress().size(); i++) {
+                        auxType.add(auxAddress.get(i).getType());
+                    }
                 }
                 field = "address";
                 break;
@@ -86,7 +89,7 @@ public abstract class RecyclerViewIndividaulContactAdapter extends RecyclerView.
         public ViewHolder(View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.item);
-            imageViewIcon=itemView.findViewById(R.id.image_view_type);
+            imageViewIcon = itemView.findViewById(R.id.image_view_type);
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -107,35 +110,45 @@ public abstract class RecyclerViewIndividaulContactAdapter extends RecyclerView.
             case 3:
                 return R.drawable.work_icon;
             case 4:
-            case 5:return R.drawable.fax_icon;
-            default: return R.drawable.phone_icon;
-        }
-    }
-    private int setIconTypeEmail(int type){
-        switch (type){
-            case 1: return R.drawable.home_icon;
-            case 2: return R.drawable.work_icon;
-            case 4:return R.drawable.mobile_icon;
-            default: return R.drawable.email_icon;
-        }
-    }
-    private int setIconTypeAddress(int type){
-        switch (type){
-            case 1:return R.drawable.home_icon;
-            default:return R.drawable.work_icon;
+            case 5:
+                return R.drawable.fax_icon;
+            default:
+                return R.drawable.phone_icon;
         }
     }
 
-    private int getIcon(String infoType, int position){
-        if(arrayListType.size()>0){
-            if(infoType.equals("number")){
+    private int setIconTypeEmail(int type) {
+        switch (type) {
+            case 1:
+                return R.drawable.home_icon;
+            case 2:
+                return R.drawable.work_icon;
+            case 4:
+                return R.drawable.mobile_icon;
+            default:
+                return R.drawable.email_icon;
+        }
+    }
+
+    private int setIconTypeAddress(int type) {
+        switch (type) {
+            case 1:
+                return R.drawable.home_icon;
+            default:
+                return R.drawable.work_icon;
+        }
+    }
+
+    private int getIcon(String infoType, int position) {
+        if (arrayListType.size() > 0) {
+            if (infoType.equals("number")) {
                 return setIconTypeNumber(arrayListType.get(position));
-            }else if (infoType.equals("email")){
+            } else if (infoType.equals("email")) {
                 return setIconTypeEmail(arrayListType.get(position));
-            }else{
+            } else {
                 return setIconTypeAddress(arrayListType.get(position));
             }
-        }else{
+        } else {
             return R.drawable.nothing_icon;
         }
     }

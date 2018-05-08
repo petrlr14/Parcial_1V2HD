@@ -4,9 +4,9 @@ import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
 
-class Contacts(var name:String?, var numbers:List<PhoneNumber>?, var email:List<Email>?, @Transient var photo: Bitmap?, var id:String?, var fav:Boolean?, var address:List<Address>?, var birthday:String?) : Parcelable {
+class Contacts(var name:Name?, var numbers:List<PhoneNumber>?, var email:List<Email>?, @Transient var photo: Bitmap?, var id:String?, var fav:Boolean?, var address:List<Address>?, var birthday:String?) : Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
+            parcel.readParcelable(Name::class.java.classLoader),
             parcel.createTypedArrayList(PhoneNumber),
             parcel.createTypedArrayList(Email),
             parcel.readParcelable(Bitmap::class.java.classLoader),
@@ -17,7 +17,7 @@ class Contacts(var name:String?, var numbers:List<PhoneNumber>?, var email:List<
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(name)
+        parcel.writeParcelable(name, flags)
         parcel.writeTypedList(numbers)
         parcel.writeTypedList(email)
         parcel.writeParcelable(photo, flags)
@@ -115,6 +115,34 @@ class Address(var address: String?, var type: Int) : Parcelable {
         }
 
         override fun newArray(size: Int): Array<Address?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
+class Name(var firstName:String?, var middleName:String?, var lastName:String?) : Parcelable {
+    constructor(parcel: Parcel) : this(
+            parcel.readString(),
+            parcel.readString(),
+            parcel.readString()) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(firstName)
+        parcel.writeString(middleName)
+        parcel.writeString(lastName)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Name> {
+        override fun createFromParcel(parcel: Parcel): Name {
+            return Name(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Name?> {
             return arrayOfNulls(size)
         }
     }
